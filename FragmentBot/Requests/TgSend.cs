@@ -13,7 +13,7 @@ namespace FragmentBot.Requests
     {
         private static string token = "6227438127:AAEZ3SxWcxYbvqlBer3_PUE0uHuzIpg-eFo";
         private static TelegramBotClient bot;
-        private static long chatId = 1001957631663;
+        private static long chatId = -1001957631663;
 
         public static async void BotStart(string TgName, string bid, string auctionEnd, string bidAddr)
         {
@@ -37,7 +37,7 @@ namespace FragmentBot.Requests
             {
                 await bot.SendTextMessageAsync(
                     chatId: new ChatId(chatId),
-                    text: $"Имя в ТГ: {TgName}\nСтавка: {bid}\nВремя окончания аукциона: {auctionEnd}\nbid Адрес: {bidAddr}",
+                    text: $"Имя в ТГ: {TgName} \n Ставка: {bid} \n Время окончания аукциона: {auctionEnd} \n bid Адрес: {bidAddr}",
                     parseMode: ParseMode.MarkdownV2,
                     disableNotification: true,
                     replyMarkup: new InlineKeyboardMarkup(
@@ -48,7 +48,7 @@ namespace FragmentBot.Requests
             }
             catch (Exception ex)
             {
-                Console.WriteLine("GetMessage: " + ex.Message);
+                Console.WriteLine("Ошибка отправки сообщения в ТГ: " + ex.Message);
             }
         }
     }

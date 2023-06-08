@@ -43,7 +43,7 @@ namespace FragmentBot
                 // Отправка всех данных в ТГ
                 Requests.TelegramAlert.BotStart(TgName, Bid, AuctionEnd, BidAddr);
 
-                Thread.Sleep(2000);
+                //Thread.Sleep(2000);
 
                 Requests.RqToFragment.NameLst.RemoveAt(0);
                 Requests.RqToFragment.BidLst.RemoveAt(0);
