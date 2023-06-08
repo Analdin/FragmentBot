@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FragmentBot
@@ -37,9 +38,12 @@ namespace FragmentBot
                 Bid = Requests.RqToFragment.BidLst[0];
                 AuctionEnd = Requests.RqToFragment.AuctionLst[0];
                 TgName = Requests.RqToFragment.NameLst[0];
+                BidAddr = Requests.RqToFragment.BidsAddr[0];
 
                 // Отправка всех данных в ТГ
                 Requests.TelegramAlert.BotStart(TgName, Bid, AuctionEnd, BidAddr);
+
+                Thread.Sleep(2000);
 
                 Requests.RqToFragment.NameLst.RemoveAt(0);
                 Requests.RqToFragment.BidLst.RemoveAt(0);

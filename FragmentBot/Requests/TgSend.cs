@@ -13,7 +13,7 @@ namespace FragmentBot.Requests
     {
         private static string token = "6227438127:AAEZ3SxWcxYbvqlBer3_PUE0uHuzIpg-eFo";
         private static TelegramBotClient bot;
-        private static long chatId = -1001957631663;
+        private static long chatId = 1001957631663;
 
         public static async void BotStart(string TgName, string bid, string auctionEnd, string bidAddr)
         {
