@@ -34,25 +34,26 @@ namespace FragmentBot
 
             for(int i = 0; i < Requests.RqToFragment.NameLst.Count; i++)
             {
-                TgName = Requests.RqToFragment.NameLst[0];
-                Bid = Requests.RqToFragment.BidLst[0];
-                AuctionEnd = Requests.RqToFragment.AuctionLst[0];
-                TgName = Requests.RqToFragment.NameLst[0];
-                BidAddr = Requests.RqToFragment.BidsAddr[0];
+                TgName = Requests.RqToFragment.NameLst[i];
+                Bid = Requests.RqToFragment.BidLst[i];
+                AuctionEnd = Requests.RqToFragment.AuctionLst[i];
+                TgName = Requests.RqToFragment.NameLst[i];
+                BidAddr = Requests.RqToFragment.BidsAddr[i];
 
                 // Отправка всех данных в ТГ
-                Requests.TelegramAlert.BotStart(TgName, Bid, AuctionEnd, BidAddr);
+                Requests.TelegramAlert str = new Requests.TelegramAlert();
+                str.BotStart(TgName, Bid, AuctionEnd, BidAddr);
 
                 //Thread.Sleep(2000);
 
-                Requests.RqToFragment.NameLst.RemoveAt(0);
-                Requests.RqToFragment.BidLst.RemoveAt(0);
-                Requests.RqToFragment.AuctionLst.RemoveAt(0);
-                Requests.RqToFragment.NameLst.RemoveAt(0);
-                Requests.RqToFragment.NameLst.Add(TgName);
-                Requests.RqToFragment.BidLst.Add(Bid);
-                Requests.RqToFragment.AuctionLst.Add(AuctionEnd);
-                Requests.RqToFragment.NameLst.Add(BidAddr);
+                //Requests.RqToFragment.NameLst.RemoveAt(0);
+                //Requests.RqToFragment.BidLst.RemoveAt(0);
+                //Requests.RqToFragment.AuctionLst.RemoveAt(0);
+                //Requests.RqToFragment.NameLst.RemoveAt(0);
+                //Requests.RqToFragment.NameLst.Add(TgName);
+                //Requests.RqToFragment.BidLst.Add(Bid);
+                //Requests.RqToFragment.AuctionLst.Add(AuctionEnd);
+                //Requests.RqToFragment.NameLst.Add(BidAddr);
             }
         }
     }

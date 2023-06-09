@@ -15,24 +15,10 @@ namespace FragmentBot.Requests
         private static TelegramBotClient bot;
         private static long chatId = -1001957631663;
 
-        public static async void BotStart(string TgName, string bid, string auctionEnd, string bidAddr)
+        public async void BotStart(string TgName, string bid, string auctionEnd, string bidAddr)
         {
             bot = new TelegramBotClient(token);
-            TeleJob(TgName, bid, auctionEnd, bidAddr);
-        }
-        public static async void TeleJob(string TgName, string bid, string auctionEnd, string bidAddr)
-        {
-            try
-            {
-                GetMessage(TgName, bid, auctionEnd, bidAddr);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Сообщение телеграм: " + ex.Message);
-            }
-        }
-        static async Task GetMessage(string TgName, string bid, string auctionEnd, string bidAddr)
-        {
+
             try
             {
                 await bot.SendTextMessageAsync(
