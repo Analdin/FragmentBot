@@ -11,11 +11,12 @@ namespace FragmentBot.Requests
 {
     public class TelegramAlert
     {
-        private static string token = "6227438127:AAEZ3SxWcxYbvqlBer3_PUE0uHuzIpg-eFo";
-        private static TelegramBotClient bot;
-        private static long chatId = -1001957631663;
+        private string token = "6227438127:AAEZ3SxWcxYbvqlBer3_PUE0uHuzIpg-eFo";
+        private TelegramBotClient bot;
+        private long chatId = -1001957631663;
+        public Random rnd = new Random();
 
-        public async void BotStart(string TgName, string bid, string auctionEnd, string bidAddr)
+        public async Task BotStart(string TgName, string bid, string auctionEnd, string bidAddr, string linkUrl, string aucSt)
         {
             bot = new TelegramBotClient(token);
 
@@ -23,18 +24,24 @@ namespace FragmentBot.Requests
             {
                 await bot.SendTextMessageAsync(
                     chatId: new ChatId(chatId),
-                    text: $"Имя в ТГ: {TgName} \n Ставка: {bid} \n Время окончания аукциона: {auctionEnd} \n bid Адрес: {bidAddr}",
-                    parseMode: ParseMode.MarkdownV2,
+                    text: $"Auction started: {aucSt} Username: {TgName} \n Current bid: {bid} \n Wallet: {bidAddr} \n\n Auction will end: {auctionEnd}",
+                    //parseMode: ParseMode.MarkdownV2,
                     disableNotification: true,
                     replyMarkup: new InlineKeyboardMarkup(
                             InlineKeyboardButton.WithUrl(
                                     text: "Ссылка на кабинет",
-                                    url: "https://core.telegram.org/bots/api#sendmessage"))
+                                    url: linkUrl))
                     );
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Ошибка отправки сообщения в ТГ: " + ex.Message);
+
+                if(ex.Message.Contains("Too Many Requests"))
+                {
+                    Console.WriteLine("Много запросов, пауза 50 сек.");
+                    Thread.Sleep(rnd.Next(50000, 60000));
+                }
             }
         }
     }

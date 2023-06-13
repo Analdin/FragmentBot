@@ -9,12 +9,15 @@ namespace FragmentBot
 {
     internal class Program
     {
+        public static Random rnd = new Random();
+        public static string TgName1 { get; set; }
         public static string TgName { get; set; }
         public static string Bid { get; set; }
         public static string AuctionEnd { get; set; }
         public static string BidAddr { get; set; }
+        public static string auctionBid { get; set; }
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             // Собираем данные со страницы
             Requests.RqToFragment run = new Requests.RqToFragment();
@@ -31,29 +34,28 @@ namespace FragmentBot
             Console.WriteLine("Запрос бид адреса");
             run.GetAddBidAddr();
 
+            Console.WriteLine("Запрос времени старта аукциона");
+            run.AuctionStarted();
 
-            for(int i = 0; i < Requests.RqToFragment.NameLst.Count; i++)
+            // Отправка всех данных в ТГ
+            Requests.TelegramAlert str = new Requests.TelegramAlert();
+
+            for (int i = 0; i < Requests.RqToFragment.NameLst.Count; i++)
             {
-                TgName = Requests.RqToFragment.NameLst[i];
+                Thread.Sleep(rnd.Next(4000, 6000));
+
+                TgName1 = Requests.RqToFragment.NameLst[i];
                 Bid = Requests.RqToFragment.BidLst[i];
                 AuctionEnd = Requests.RqToFragment.AuctionLst[i];
                 TgName = Requests.RqToFragment.NameLst[i];
                 BidAddr = Requests.RqToFragment.BidsAddr[i];
+                auctionBid = Requests.RqToFragment.AucSt[i];
 
-                // Отправка всех данных в ТГ
-                Requests.TelegramAlert str = new Requests.TelegramAlert();
-                str.BotStart(TgName, Bid, AuctionEnd, BidAddr);
+                TgName = TgName.Remove(0, 1);
 
-                //Thread.Sleep(2000);
+                //BidAddr = BidAddr.Replace("-", "\\-");
 
-                //Requests.RqToFragment.NameLst.RemoveAt(0);
-                //Requests.RqToFragment.BidLst.RemoveAt(0);
-                //Requests.RqToFragment.AuctionLst.RemoveAt(0);
-                //Requests.RqToFragment.NameLst.RemoveAt(0);
-                //Requests.RqToFragment.NameLst.Add(TgName);
-                //Requests.RqToFragment.BidLst.Add(Bid);
-                //Requests.RqToFragment.AuctionLst.Add(AuctionEnd);
-                //Requests.RqToFragment.NameLst.Add(BidAddr);
+                await str.BotStart(TgName1, Bid, AuctionEnd, BidAddr, $"https://fragment.com/", auctionBid);
             }
         }
     }
