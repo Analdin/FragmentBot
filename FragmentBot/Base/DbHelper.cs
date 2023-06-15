@@ -7,7 +7,7 @@ namespace WbHelperDB
     public class DbHelper
     {
         private const string Server = "37.140.192.191";
-        private const string DatabaseName = "u1486803_FragmentBD";
+        private const string DatabaseName = "u1486803_fragmentbd";
         private const string UserName = "u1486803_fbdu";
         private const string Password = "nJ7eR9xE2myO3cW8";
 

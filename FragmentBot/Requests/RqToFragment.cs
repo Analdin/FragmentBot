@@ -113,10 +113,7 @@ namespace FragmentBot.Requests
 
                 string ts = Regex.Match(content, pattern).ToString();
 
-                //foreach(Match elm in timeStart)
-                //{
-                    buffer.Add(ts);
-                //}
+                buffer.Add(ts);
 
                 AucSt.Add(buffer.LastOrDefault());
                 Console.WriteLine($"Начало аукциона - {buffer.LastOrDefault()}");

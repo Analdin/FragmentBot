@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
+using WbHelperDB;
 
 namespace FragmentBot
 {
@@ -16,11 +16,19 @@ namespace FragmentBot
         public static string AuctionEnd { get; set; }
         public static string BidAddr { get; set; }
         public static string auctionBid { get; set; }
+        //
+        public static string id { get; set; }
+        public static string bid2 { get; set; }
+        public static string Uname { get; set; }
+        public static string bid3 { get; set; }
 
         static async Task Main(string[] args)
         {
             // Собираем данные со страницы
             Requests.RqToFragment run = new Requests.RqToFragment();
+            DbHelper db = new DbHelper();
+
+            db.OpenConnection();
 
             Console.WriteLine("Запрос имен с ТГ");
             run.getTGUserName();
@@ -42,7 +50,11 @@ namespace FragmentBot
 
             for (int i = 0; i < Requests.RqToFragment.NameLst.Count; i++)
             {
-                Thread.Sleep(rnd.Next(4000, 6000));
+                await Task.Delay(rnd.Next(1000, 2000));
+
+                // Проверить наличие такого же значения в бд
+                // Если нет - записать
+                // Если есть - обновить ставку и вывести новую
 
                 TgName1 = Requests.RqToFragment.NameLst[i];
                 Bid = Requests.RqToFragment.BidLst[i];
@@ -53,10 +65,69 @@ namespace FragmentBot
 
                 TgName = TgName.Remove(0, 1);
 
-                //BidAddr = BidAddr.Replace("-", "\\-");
+                // Выборка с базы
+                string query = $"SELECT `id`, `newBid`, `Username`,`CurBid` FROM `bids` WHERE `Username` = '{TgName}'";
+                var command = new MySqlCommand(query, db.Connection);
+                var reader = command.ExecuteReader();
 
-                await str.BotStart(TgName1, Bid, AuctionEnd, BidAddr, $"https://fragment.com/", auctionBid);
+                while (reader.Read())
+                {
+                    id = reader.GetString(0);
+                    bid2 = reader.GetString(1);
+                    Uname = reader.GetString(2);
+                    bid3 = reader.GetString(3);
+                }
+                reader.Close();
+
+                decimal bidValue;
+                decimal bid2Value;
+                if (decimal.TryParse(Bid, out bidValue) && decimal.TryParse(bid2, out bid2Value))
+                {
+                    if (bidValue > bid2Value)
+                    {
+                        MySqlCommand upBd = new MySqlCommand($@"UPDATE `bids`
+                        SET `newBid` = IF(`newBid` < {Bid}, {Bid}, `newBid`)
+                        WHERE `id` = {id}",db.Connection);
+
+                        upBd.ExecuteNonQuery();
+
+                        await str.BotStart(TgName1, Bid, AuctionEnd, BidAddr, $"https://fragment.com/", auctionBid);
+                    }
+                    else
+                    {
+                        // Проверяем есть ли запись с таким Username в бд
+                        //MySqlCommand strYes = new MySqlCommand($@"SELECT COUNT(*) FROM `bids` WHERE `Username` = '{TgName}'");
+                        //strYes.ExecuteNonQuery();
+
+                        using (var cmd = new MySqlCommand($@"SELECT COUNT(*) FROM `bids` WHERE `Username` = '{TgName}'", db.Connection))
+                        {
+                            cmd.Parameters.AddWithValue("@Username", TgName);
+                            int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+                            if(count > 0)
+                            {
+                                Console.WriteLine($"Запись для ника {TgName}, уже есть в базе");
+                            }
+                            else
+                            {
+                                await str.BotStart(TgName1, Bid, AuctionEnd, BidAddr, $"https://fragment.com/", auctionBid);
+
+                                MySqlCommand countPlus = new MySqlCommand($@"INSERT INTO `bids` (`AuctionStarted`, `newBid`, `Username`, `CurBid`, `Wallet`, `AuctionEnd`) 
+                                VALUES('{auctionBid}','{Bid}','{TgName}','{Bid}','{BidAddr}','{AuctionEnd}')", db.Connection);
+
+                                countPlus.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Обработка случая, когда преобразование не удалось
+                    // Можно выбрать соответствующее действие или сообщение об ошибке
+                }
             }
+            Console.WriteLine("Собрали все ставки, переходим к мониторингу.");
+            db.CloseConnection();
         }
     }
 }
